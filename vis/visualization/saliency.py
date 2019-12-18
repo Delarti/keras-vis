@@ -81,7 +81,8 @@ def visualize_saliency_with_losses(input_tensor, losses, seed_input, wrt_tensor=
     if not keepdims:
         channel_idx = 1 if K.image_data_format() == 'channels_first' else -1
         grads = np.max(grads, axis=channel_idx)
-    return utils.normalize(grads)[0]
+#     return utils.normalize(grads)[0]
+    return grads[0]
 
 
 def visualize_saliency(model, layer_idx, filter_indices, seed_input, wrt_tensor=None,
