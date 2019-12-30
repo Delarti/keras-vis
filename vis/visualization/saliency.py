@@ -134,6 +134,30 @@ def visualize_saliency(model, layer_idx, filter_indices, seed_input, wrt_tensor=
     ]
     return visualize_saliency_with_losses(model.input, losses, seed_input, wrt_tensor, grad_modifier, keepdims)
 
+##################################################################################################################
+def get_gradients_saliency_unamur(model, layer_idx, filter_indices, seed_input, wrt_tensor=None,
+                                  backprop_modifier=None, grad_modifier=None, keepdims=False):
+    
+    if backprop_modifier is not None:
+        modifier_fn = get(backprop_modifier)
+        model = modifier_fn(model)
+    
+    # `ActivationMaximization` loss reduces as outputs get large, hence negative gradients indicate the direction
+    # for increasing activations. Multiply with -1 so that positive gradients indicate increase instead.
+    losses = [
+        (ActivationMaximization(model.layers[layer_idx], filter_indices), -1)
+    ]
+    
+    opt = Optimizer(model.input, losses, wrt_tensor=wrt_tensor, norm_grads=False)
+    grads = opt.minimize(seed_input=seed_input, max_iter=1, grad_modifier=grad_modifier, verbose=False)[1]
+    
+    if not keepdims:
+        channel_idx = 1 if K.image_data_format() == 'channels_first' else -1
+        grads = np.max(grads, axis=channel_idx)
+        
+    return grads[0]
+    
+##################################################################################################################
 
 def visualize_cam_with_losses(input_tensor, losses, seed_input, penultimate_layer, grad_modifier=None):
     """Generates a gradient based class activation map (CAM) by using positive gradients of `input_tensor`
