@@ -154,10 +154,8 @@ def get_gradients_saliency_unamur(model, layer_idx, filter_indices, seed_input, 
 #     if not keepdims:
 #         channel_idx = 1 if K.image_data_format() == 'channels_first' else -1
 #         grads = np.max(grads, axis=channel_idx)
-
-    norm_grads = utils.normalize(grads)
         
-    return grads, norm_grads
+    return grads[0]
     
 ##################################################################################################################
 
