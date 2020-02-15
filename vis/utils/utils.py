@@ -110,6 +110,9 @@ def apply_modifications(model, custom_objects=None):
     model_path = os.path.join(tempfile.gettempdir(), next(tempfile._get_candidate_names()) + '.h5')
     try:
         model.save(model_path)
+        ###################################
+        K.clear_session()
+        ###################################
         return load_model(model_path, custom_objects=custom_objects)
     finally:
         os.remove(model_path)
