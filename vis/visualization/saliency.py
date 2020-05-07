@@ -135,8 +135,8 @@ def visualize_saliency(model, layer_idx, filter_indices, seed_input, wrt_tensor=
     return visualize_saliency_with_losses(model.input, losses, seed_input, wrt_tensor, grad_modifier, keepdims)
 
 ##################################################################################################################
-def get_gradients_saliency_unamur(model, layer_idx, filter_indices, seed_input, wrt_tensor=None,
-                                  backprop_modifier=None, grad_modifier=None, keepdims=False):
+def get_gradients_saliency_unamur_init(model, layer_idx, filter_indices, seed_input, wrt_tensor=None,
+                                       backprop_modifier=None, grad_modifier=None, keepdims=False):
     
     if backprop_modifier is not None:
         modifier_fn = get(backprop_modifier)
@@ -149,6 +149,11 @@ def get_gradients_saliency_unamur(model, layer_idx, filter_indices, seed_input, 
     ]
     
     opt = Optimizer(model.input, losses, wrt_tensor=wrt_tensor, norm_grads=False)
+    
+    return opt
+    
+def get_gradients_saliency_unamur_run(opt, seed_input, wrt_tensor=None, backprop_modifier=None, grad_modifier=None, keepdims=False):
+    
     grads = opt.minimize(seed_input=seed_input, max_iter=1, grad_modifier=grad_modifier, verbose=False)[1]
     
 #     if not keepdims:
